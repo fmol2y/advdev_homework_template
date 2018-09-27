@@ -295,20 +295,20 @@
             "description": "Maximum amount of CPU the container can use.",
             "displayName": "CPU Limit",
             "name": "CPU_LIMIT",
-            "value": "1"
+            "value": "500m"
         },
         {
             "description": "Maximum amount of memory the container can use.",
             "displayName": "Memory Limit",
             "name": "MEMORY_LIMIT",
-            "value": "512Mi"
+            "value": "256Mi"
         },
         {
             "description": "Volume space available for data, e.g. 512Mi, 2Gi.",
             "displayName": "Volume Capacity",
             "name": "VOLUME_CAPACITY",
             "required": true,
-            "value": "1Gi"
+            "value": "512Mi"
         },
         {
             "description": "The OpenShift Namespace where the Jenkins ImageStream resides.",
