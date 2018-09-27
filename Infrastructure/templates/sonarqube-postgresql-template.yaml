@@ -71,7 +71,7 @@ objects:
         intervalSeconds: 1
         maxSurge: 25%
         maxUnavailable: 25%
-        timeoutSeconds: 600
+        timeoutSeconds: 1200
         updatePeriodSeconds: 1
       type: Rolling
     template:
@@ -98,7 +98,7 @@ objects:
           - containerPort: 9000
             protocol: TCP
           livenessProbe:
-            failureThreshold: 3
+            failureThreshold: 5
             initialDelaySeconds: 60
             periodSeconds: 20
             successThreshold: 1
@@ -107,7 +107,7 @@ objects:
               path: /
             timeoutSeconds: 5
           readinessProbe:
-            failureThreshold: 3
+            failureThreshold: 5
             initialDelaySeconds: 60
             periodSeconds: 20
             successThreshold: 1
@@ -118,10 +118,10 @@ objects:
           resources:
             requests:
               cpu: 250m
-              memory: 1Gi
+              memory: 512Mi
             limits:
-              cpu: 1500m
-              memory: 3Gi
+              cpu: 1000m
+              memory: 1Gi
           terminationMessagePath: /dev/termination-log
           volumeMounts:
           - mountPath: /opt/sonarqube/data
@@ -129,7 +129,7 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
-        terminationGracePeriodSeconds: 30
+        terminationGracePeriodSeconds: 60
         volumes:
         - name: sonarqube-data
           persistentVolumeClaim:
@@ -175,7 +175,7 @@ objects:
       deploymentconfig: postgresql-sonarqube
     strategy:
       recreateParams:
-        timeoutSeconds: 600
+        timeoutSeconds: 1200
       resources: {}
       type: Recreate
     template:
@@ -195,7 +195,7 @@ objects:
           image: ' '
           imagePullPolicy: IfNotPresent
           livenessProbe:
-            failureThreshold: 3
+            failureThreshold: 5
             initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
@@ -213,11 +213,11 @@ objects:
               - -i
               - -c
               - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
-            failureThreshold: 3
-            initialDelaySeconds: 5
+            failureThreshold: 5
+            initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           resources:
             limits:
               memory: 256Mi
@@ -231,7 +231,7 @@ objects:
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
-        terminationGracePeriodSeconds: 30
+        terminationGracePeriodSeconds: 60
         volumes:
         - name: postgresql-data
           persistentVolumeClaim:
@@ -287,9 +287,9 @@ parameters:
   displayName: PostgreSQL Volume Capacity
   name: POSTGRESQL_VOLUME_CAPACITY
   required: true
-  value: 1Gi
+  value: 512Mi
 - description: Volume space available for SonarQube
   displayName: SonarQube Volume Capacity
   name: SONAR_VOLUME_CAPACITY
   required: true
-  value: 1Gi
+  value: 512Mi
