@@ -14,3 +14,8 @@ echo "Setting up Sonarqube in project $GUID-sonarqube"
 # oc new-app -f ../templates/sonarqube.yaml --param .....
 
 # To be Implemented by Student
+
+oc new-app -f "${TEMPLATES_PATH:-./Infrastructure/templates}"/sonarqube-postgresql-template.yaml \
+  --param=SONARQUBE_IMAGE=docker.io/wkulhanek/sonarqube \
+  --param=SONARQUBE_VERSION=7.3 \
+  -n "${GUID}-sonarqube"
