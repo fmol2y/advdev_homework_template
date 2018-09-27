@@ -27,3 +27,36 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 # * CLUSTER: the base url of the cluster used (e.g. na39.openshift.opentlc.com)
 
 # To be Implemented by Student
+
+echo '------ Create the Jenkins App ------'
+
+oc new-app -f "${TEMPLATES_PATH:-./Infrastructure/templates}"/jenkins-persistent-template.json \
+  --param ENABLE_OAUTH=true \
+  --param MEMORY_LIMIT=2Gi \
+  --param CPU_LIMIT=1 \
+  --param VOLUME_CAPACITY=4Gi \
+  -n "${GUID}-jenkins"
+
+oc patch dc/jenkins \
+  -p "{\"spec\":{\"strategy\":{\"recreateParams\":{\"timeoutSeconds\":1200}}}}" \
+  -n "${GUID}-jenkins"
+
+echo '------ Build Skopeo Docker Image ------'
+# https://docs.openshift.com/container-platform/3.9/dev_guide/builds/build_output.html
+
+oc create imagestream jenkins-slave-appdev -n "${GUID}-jenkins"
+oc create -f "${TEMPLATES_PATH:-./Infrastructure/templates}"/BuildConfig_Skopeo -n "${GUID}-jenkins"
+oc start-build skopeo-build -n "${GUID}-jenkins"
+
+echo '------- Create BuildConfig_MLBParks ---------'
+# https://docs.openshift.com/container-platform/3.9/dev_guide/builds/build_strategies.html#jenkinsfile
+# https://docs.openshift.com/container-platform/3.9/dev_guide/builds/build_environment.html#using-build-fields-as-environment-variables
+
+sed "s/\${GUID}/${GUID}/g;s/\${CLUSTER}/${CLUSTER}/g;s/\${FAST_MODE}/${FAST_MODE:-false}/g" "${TEMPLATES_PATH:-./Infrastructure/templates}"/BuildConfig_MLBParks | oc create -n "${GUID}-jenkins" -f -
+
+echo '------- Create BuildConfig_Nationalparks ---------'
+sed "s/\${GUID}/${GUID}/g;s/\${CLUSTER}/${CLUSTER}/g;s/\${FAST_MODE}/${FAST_MODE:-false}/g" "${TEMPLATES_PATH:-./Infrastructure/templates}"/BuildConfig_Nationalparks | oc create -n "${GUID}-jenkins" -f -
+
+echo '------- Create BuildConfig_ParksMap ---------'
+# See https://github.com/jenkinsci/kubernetes-plugin#declarative-pipeline
+sed "s/\${GUID}/${GUID}/g;s/\${CLUSTER}/${CLUSTER}/g;s/\${FAST_MODE}/${FAST_MODE:-false}/g" "${TEMPLATES_PATH:-./Infrastructure/templates}"/BuildConfig_ParksMap | oc create -n "${GUID}-jenkins" -f -
