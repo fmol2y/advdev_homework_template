@@ -32,13 +32,13 @@ echo '------ Create the Jenkins App ------'
 
 oc new-app -f "${TEMPLATES_PATH:-./Infrastructure/templates}"/jenkins-persistent-template.json \
   --param ENABLE_OAUTH=true \
-  --param MEMORY_LIMIT=2Gi \
-  --param CPU_LIMIT=1 \
-  --param VOLUME_CAPACITY=4Gi \
+  --param MEMORY_LIMIT=1Gi \
+  --param CPU_LIMIT=500m \
+  --param VOLUME_CAPACITY=2Gi \
   -n "${GUID}-jenkins"
 
 oc patch dc/jenkins \
-  -p "{\"spec\":{\"strategy\":{\"recreateParams\":{\"timeoutSeconds\":1200}}}}" \
+  -p "{\"spec\":{\"strategy\":{\"recreateParams\":{\"timeoutSeconds\":2400}}}}" \
   -n "${GUID}-jenkins"
 
 echo '------ Build Skopeo Docker Image ------'
