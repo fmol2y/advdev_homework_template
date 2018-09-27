@@ -18,3 +18,6 @@ echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Gr
 # rollout followed by a Green rollout.
 
 # To be Implemented by Student
+
+source "${BIN_PATH:-./Infrastructure/bin}"/utils.sh
+switch_all_service_color "$GUID" 'Blue'
